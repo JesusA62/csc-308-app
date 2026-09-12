@@ -32,16 +32,36 @@ function MyApp() {
       });
   }, []);
 
-  function removeOneCharacter(index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index;
+  function removeOneCharacter(id) {
+  fetch(`http://localhost:8000/users/${id}`, {
+    method: "DELETE",
+  })
+    .then((response) => {
+      if (response.status === 204) {
+        const updated = characters.filter(
+          (character) => character.id !== id
+        );
+        setCharacters(updated);
+      }
+    })
+    .catch((error) => {
+      console.log(error);
     });
-    setCharacters(updated);
-  }
+}
 
   function updateList(person) {
   postUser(person)
-    .then(() => setCharacters([...characters, person]))
+    .then((response) => {
+      if (response.status === 201) {
+        return response.json();
+      }
+      return null;
+    })
+    .then((newPerson) => {
+      if (newPerson != null) {
+        setCharacters([...characters, newPerson]);
+      }
+    })
     .catch((error) => {
       console.log(error);
     });
